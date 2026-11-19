@@ -1,0 +1,2 @@
+export const colors={primary:'#227A71',primaryDark:'#185C55',primaryLight:'#E3F2EF',accent:'#E8735F',background:'#FBF7F2',surface:'#FFFFFF',surfaceMuted:'#F5EFE7',text:'#1F2D3D',muted:'#5E6B78',border:'#ECE4DA',error:'#B3363C',missing:'#C8424A',missingTint:'#FBE6E7',missingText:'#9A2A31',sighting:'#2F6FCE',sightingTint:'#E3EDFB',reunited:'#2E8456',reunitedTint:'#E2F3E9'};
+export const spacing={xs:4,sm:8,md:12,lg:16,xl:20,xxl:24,xxxl:32};export const radius={sm:8,md:14,lg:18,xl:24,pill:999};

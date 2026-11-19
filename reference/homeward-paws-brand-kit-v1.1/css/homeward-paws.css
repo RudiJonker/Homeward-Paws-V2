@@ -1,0 +1,140 @@
+/* Homeward Paws — web component stylesheet v1.1 (17 Nov 2026)
+   For websites, admin pages, emails-in-browser previews and prototypes.
+   Tokens come from ../tokens/tokens.css (generated from tokens.json). Use the variables, never raw hex.
+   Rules: status = colour + icon + label; coral never carries text or status; teal is the action colour. */
+
+@import url('../tokens/tokens.css');
+
+/* ---------- Fonts (self-hosted, SIL OFL 1.1; see fonts/) ---------- */
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/nunito-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/nunito-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/nunito-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap; src: url('fonts/nunito-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 900; font-display: swap; src: url('fonts/nunito-latin-900-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Dancing Script'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/dancing-script-latin-600-normal.woff2') format('woff2'); }
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; color-scheme: light; }
+body { margin: 0; background: var(--hp-background); color: var(--hp-text-primary); font-family: var(--hp-font-sans); font-size: 17px; line-height: 1.6; }
+img, svg { max-width: 100%; display: block; }
+a { color: var(--hp-primary); font-weight: 700; text-underline-offset: 3px; }
+a:hover { color: var(--hp-primary-dark); }
+:focus-visible { outline: 3px solid var(--hp-primary); outline-offset: 3px; border-radius: 6px; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.15; text-wrap: balance; }
+p { margin: 0; }
+@media (max-width: 560px) { body { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- Layout ---------- */
+.hp-wrap { width: 100%; max-width: var(--hp-max-width); margin: 0 auto; padding-inline: max(var(--hp-gutter), env(safe-area-inset-left, 0px)); }
+.hp-section { padding-block: var(--hp-section-padding); }
+@media (max-width: 560px) { .hp-section { padding-block: 52px; } }
+.hp-stack { display: flex; flex-direction: column; gap: var(--hp-space-lg); }
+.hp-row { display: flex; flex-wrap: wrap; gap: var(--hp-space-md); align-items: center; }
+
+/* ---------- Type ---------- */
+.hp-display { font-size: clamp(40px, 5.2vw, 64px); font-weight: 900; letter-spacing: -0.01em; }
+.hp-h1 { font-size: clamp(34px, 5vw, 48px); font-weight: 900; }
+.hp-h2 { font-size: clamp(30px, 4vw, 42px); font-weight: 900; }
+.hp-h3 { font-size: 22px; font-weight: 900; }
+.hp-h4 { font-size: 18px; font-weight: 800; }
+.hp-lead { font-size: 18px; font-weight: 600; color: var(--hp-text-secondary); }
+.hp-small { font-size: 14px; font-weight: 600; color: var(--hp-text-secondary); }
+.hp-eyebrow { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--hp-primary); }
+.hp-script { font-family: var(--hp-font-script); font-weight: 600; } /* website photo captions only */
+
+/* ---------- Buttons ----------
+   Primary = the one main action. Secondary = outlined. Text = cancel/skip/learn more.
+   Urgent status buttons are scarce and labelled; destructive only for genuinely destructive actions. */
+.hp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: var(--hp-button-min-height); padding: 12px 24px; border-radius: var(--hp-radius-md); border: 2px solid transparent; font-family: var(--hp-font-sans); font-size: 16px; font-weight: 800; line-height: 1.2; text-decoration: none; cursor: pointer; transition: background-color .15s, transform .1s; }
+.hp-btn:active { transform: scale(0.98); }
+.hp-btn svg { width: 20px; height: 20px; flex: none; }
+.hp-btn--primary { background: var(--hp-primary); color: var(--hp-text-on-primary); }
+.hp-btn--primary:hover { background: var(--hp-primary-dark); color: var(--hp-text-on-primary); }
+.hp-btn--secondary { background: var(--hp-surface); color: var(--hp-primary); border-color: var(--hp-primary); }
+.hp-btn--secondary:hover { background: var(--hp-primary-light); color: var(--hp-primary-dark); }
+.hp-btn--text { background: transparent; color: var(--hp-primary); padding-inline: 12px; }
+.hp-btn--text:hover { background: var(--hp-primary-light); }
+.hp-btn--destructive { background: var(--hp-error); color: var(--hp-text-on-primary); }
+.hp-btn--missing  { background: var(--hp-missing);  color: var(--hp-text-on-primary); }
+.hp-btn--sighting { background: var(--hp-sighting); color: var(--hp-text-on-primary); }
+.hp-btn--reunited { background: var(--hp-reunited); color: var(--hp-text-on-primary); }
+.hp-btn--found    { background: var(--hp-found-on-tint); color: var(--hp-text-on-primary); } /* white on the base amber fails 4.5:1, so the onTint shade is the fill */
+.hp-btn--block { width: 100%; }
+.hp-btn[disabled], .hp-btn[aria-busy="true"] { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ---------- Status chips: tint background + onTint text + icon + UPPERCASE label ---------- */
+.hp-chip { display: inline-flex; align-items: center; gap: 6px; width: fit-content; padding: 5px 12px; border-radius: var(--hp-radius-pill); font-size: 12px; font-weight: 900; letter-spacing: 0.06em; line-height: 1.3; text-transform: uppercase; white-space: nowrap; }
+.hp-chip svg { width: 15px; height: 15px; flex: none; fill: currentColor; }
+.hp-chip--missing  { background: var(--hp-missing-tint);  color: var(--hp-missing-on-tint); }
+.hp-chip--found    { background: var(--hp-found-tint);    color: var(--hp-found-on-tint); }
+.hp-chip--sighting { background: var(--hp-sighting-tint); color: var(--hp-sighting-on-tint); }
+.hp-chip--reunited, .hp-chip--safe { background: var(--hp-reunited-tint); color: var(--hp-reunited-on-tint); }
+.hp-chip--partner  { background: var(--hp-partner-tint);  color: var(--hp-partner-on-tint); }
+.hp-chip--admin    { background: var(--hp-admin-tint);    color: var(--hp-admin-on-tint); }
+
+/* Status banner (report detail header): solid base fill, large bold white text */
+.hp-status-banner { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--hp-radius-md); color: var(--hp-text-on-primary); font-size: 19px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+.hp-status-banner svg { width: 24px; height: 24px; fill: currentColor; }
+.hp-status-banner--missing  { background: var(--hp-missing); }
+.hp-status-banner--found    { background: var(--hp-found-on-tint); }
+.hp-status-banner--sighting { background: var(--hp-sighting); }
+.hp-status-banner--reunited { background: var(--hp-reunited); }
+
+/* Neutral info pill (meta such as "Free · Android"); never for status */
+.hp-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--hp-radius-pill); background: var(--hp-surface); border: 1px solid var(--hp-border); font-size: 14px; font-weight: 700; color: var(--hp-text-secondary); }
+
+/* ---------- Cards and surfaces ---------- */
+.hp-card { background: var(--hp-surface); border: 1px solid var(--hp-border); border-radius: var(--hp-radius-lg); padding: 24px; }
+.hp-card--raised { box-shadow: var(--hp-shadow-card); }
+.hp-card--hero { border-radius: var(--hp-radius-xl); overflow: hidden; }
+.hp-card--interactive { transition: transform .15s, box-shadow .15s; }
+.hp-card--interactive:hover { transform: translateY(-2px); box-shadow: var(--hp-shadow-card); }
+.hp-panel { background: var(--hp-surface-muted); border-radius: var(--hp-radius-lg); padding: 20px; }
+.hp-photo { border-radius: var(--hp-radius-lg); object-fit: cover; aspect-ratio: 4 / 3; width: 100%; background: var(--hp-surface-muted); }
+.hp-photo--square { aspect-ratio: 1 / 1; }
+.hp-divider { border: 0; border-top: 1px solid var(--hp-border); margin: 24px 0; }
+
+/* Icon tile: circular tinted tile for features, steps, empty states */
+.hp-icon-tile { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--hp-primary-light); color: var(--hp-primary-dark); }
+.hp-icon-tile svg { width: 24px; height: 24px; fill: currentColor; }
+.hp-icon-tile--accent    { background: var(--hp-accent-light);    color: var(--hp-accent); }
+.hp-icon-tile--highlight { background: var(--hp-highlight-light); color: var(--hp-highlight-on-tint); }
+.hp-icon-tile--missing   { background: var(--hp-missing-tint);    color: var(--hp-missing-on-tint); }
+.hp-icon-tile--found     { background: var(--hp-found-tint);      color: var(--hp-found-on-tint); }
+.hp-icon-tile--sighting  { background: var(--hp-sighting-tint);   color: var(--hp-sighting-on-tint); }
+.hp-icon-tile--reunited  { background: var(--hp-reunited-tint);   color: var(--hp-reunited-on-tint); }
+
+/* ---------- Callouts ---------- */
+.hp-callout { border-radius: var(--hp-radius-md); padding: 16px 20px; font-weight: 600; background: var(--hp-primary-light); color: var(--hp-text-primary); }
+.hp-callout strong { color: inherit; }
+.hp-callout--warn    { background: var(--hp-highlight-light); color: var(--hp-highlight-on-tint); }
+.hp-callout--alert   { background: var(--hp-missing-tint);    color: var(--hp-missing-on-tint); }
+.hp-callout--success { background: var(--hp-reunited-tint);   color: var(--hp-reunited-on-tint); }
+
+/* ---------- Forms: permanent labels above, inline errors ---------- */
+.hp-field { display: flex; flex-direction: column; gap: 6px; }
+.hp-label { font-size: 14px; font-weight: 800; color: var(--hp-text-primary); }
+.hp-help { font-size: 14px; font-weight: 600; color: var(--hp-text-secondary); }
+.hp-input, .hp-select, .hp-textarea { font: inherit; font-size: 16px; font-weight: 600; color: var(--hp-text-primary); background: var(--hp-surface); border: 2px solid var(--hp-border); border-radius: var(--hp-radius-sm); min-height: 50px; padding: 10px 14px; width: 100%; }
+.hp-textarea { min-height: 120px; resize: vertical; }
+.hp-input:focus, .hp-select:focus, .hp-textarea:focus { outline: none; border-color: var(--hp-primary); box-shadow: 0 0 0 3px var(--hp-primary-light); }
+.hp-field--error .hp-input, .hp-field--error .hp-select, .hp-field--error .hp-textarea { border-color: var(--hp-error); }
+.hp-error { font-size: 14px; font-weight: 700; color: var(--hp-error); }
+.hp-check { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; font-weight: 600; }
+.hp-check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--hp-primary); }
+.hp-choice { display: block; border: 2px solid var(--hp-border); border-radius: var(--hp-radius-md); padding: 14px 16px; background: var(--hp-surface); cursor: pointer; font-weight: 700; }
+.hp-choice[aria-checked="true"], .hp-choice:has(input:checked) { border-color: var(--hp-primary); background: var(--hp-primary-light); }
+
+/* ---------- Lists, steps, tables ---------- */
+.hp-steps { counter-reset: hp-step; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.hp-steps > li { counter-increment: hp-step; position: relative; padding-left: 44px; min-height: 30px; }
+.hp-steps > li::before { content: counter(hp-step); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--hp-primary); color: var(--hp-text-on-primary); display: grid; place-items: center; font-weight: 900; font-size: 14px; }
+.hp-table { border-collapse: collapse; width: 100%; font-size: 15px; }
+.hp-table th, .hp-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--hp-border); vertical-align: top; }
+.hp-table th { font-size: 13px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: var(--hp-text-secondary); }
+
+/* ---------- Utilities ---------- */
+.hp-visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hp-muted { color: var(--hp-text-secondary); }

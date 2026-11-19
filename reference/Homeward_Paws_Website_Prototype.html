@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homeward Paws | Website flow prototype</title>
+<style>
+:root{color-scheme:light;--ink:#182f29;--muted:#4c655c;--brand:#145c49;--brand-dark:#0b4737;--paper:#fcfaf4;--white:#fffefa;--line:#d4dfd4;--green:#edf4e9;--gold:#ffedca}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.55 "DM Sans",system-ui,sans-serif}button,input,select,textarea{font:inherit}a{color:var(--brand-dark)}button,a{touch-action:manipulation}button{cursor:pointer}a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #a75323;outline-offset:3px}
+.wrap{width:min(100% - 2rem,1040px);margin:auto}.mast{background:var(--white);border-bottom:1px solid var(--line)}.mast .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding-block:.8rem}.brand{font-weight:850;text-decoration:none;font-size:1.15rem}.brand span{margin-right:.45rem}.nav{display:flex;flex-wrap:wrap;gap:.2rem}.nav a{padding:.4rem .65rem;text-decoration:none;border-radius:.5rem}.nav a[aria-current]{background:var(--green);font-weight:750}.demo{background:var(--gold);font-size:.89rem}.demo .wrap{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding-block:.55rem}.demo label{white-space:nowrap}.demo select{background:var(--white);border:1px solid #86734d;border-radius:.35rem;padding:.2rem}
+main{padding-block:2.4rem 3rem;min-height:55vh}h1,h2,h3{margin:0 0 .55rem;line-height:1.14;letter-spacing:-.025em}h1{font-size:clamp(2.1rem,6vw,3.65rem);max-width:15ch}h2{font-size:1.45rem}h3{font-size:1.15rem}p{margin:.35rem 0 .9rem}p.lead{font-size:1.12rem;max-width:55ch;color:var(--muted)}.hero{padding:clamp(1.1rem,5vw,3rem);background:var(--green);border-radius:1.3rem;border:1px solid var(--line)}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;text-decoration:none;padding:.55rem .9rem;border-radius:.6rem;border:1px solid var(--brand);background:var(--white);color:var(--brand-dark);font-weight:730;text-align:center}.primary{background:var(--brand);color:white}.btn:hover{box-shadow:inset 0 0 0 1px currentColor}.row{display:flex;gap:.55rem;flex-wrap:wrap;align-items:center}.section{margin-top:1.8rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:.85rem}.card{background:var(--white);border:1px solid var(--line);border-radius:.9rem;padding:1rem;min-width:0}.card p{color:var(--muted)}.narrow{max-width:640px}.back{display:inline-block;margin-bottom:.8rem}.tag{display:inline-block;background:var(--gold);border-radius:1rem;padding:.12rem .55rem;font-size:.82rem;font-weight:700;margin-bottom:.5rem}.pet-icon{font-size:2rem;line-height:1;display:inline-grid;place-items:center;width:3.25rem;height:3.25rem;background:var(--green);border-radius:.7rem;margin-bottom:.65rem}.pet-photo{width:5rem;height:5rem;object-fit:cover;border-radius:.7rem;display:block;margin-bottom:.6rem}
+label.field{display:block;font-weight:650;margin:0 0 .9rem}.field input,.field select,.field textarea{display:block;width:100%;background:white;color:var(--ink);border:1px solid #849b8e;border-radius:.4rem;padding:.52rem;margin-top:.2rem}.field small,.small{font-size:.88rem;color:var(--muted);font-weight:400}.check{display:flex;align-items:baseline;gap:.45rem;margin:.75rem 0}.check input{accent-color:var(--brand)}details{margin:.8rem 0}summary{cursor:pointer;font-weight:700;color:var(--brand-dark)}details .field{margin-top:.7rem}ul{padding-left:1.35rem}.status{padding:.7rem 1rem;background:var(--green);border-radius:.5rem;margin-bottom:1rem}dialog{border:1px solid var(--line);border-radius:1rem;background:var(--white);color:var(--ink);padding:1.2rem;width:min(100% - 2rem,520px);max-height:85vh}dialog::backdrop{background:#182f2980}.share-text{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--green);padding:.7rem;border-radius:.4rem}footer{border-top:1px solid var(--line);padding:1rem 0 1.4rem}.facts{margin:.4rem 0 1rem}.facts dt{font-weight:750}.facts dd{margin:0 0 .65rem;overflow-wrap:anywhere}.card{overflow-wrap:anywhere}
+@media(max-width:620px){.mast .wrap{gap:.2rem}.nav{width:100%;justify-content:space-between}.nav a{padding:.42rem .32rem;font-size:.9rem}.demo .wrap{align-items:flex-start;flex-direction:column;gap:.3rem}main{padding-top:1.35rem}}
+</style>
+</head>
+<body>
+<header class="mast"><div class="wrap">
+<a class="brand" href="#home"><span aria-hidden="true">🐾</span>Homeward Paws</a>
+<nav class="nav" aria-label="Main navigation"><a href="#home">Home</a><a href="#browse">Browse</a><a href="#report">Report</a><a href="#following">Following</a><a href="#profile">Profile</a></nav>
+</div></header>
+<div class="demo"><div class="wrap"><span>Local prototype · Changes last until you reload. Sharing and contact are previews.</span>
+<label>Demo view <select id="role"><option value="owner">Pet owner</option><option value="member">Signed-in neighbour</option><option value="guest">Guest</option></select></label></div></div>
+<main class="wrap" id="screen"></main>
+<footer><div class="wrap"><details id="map"><summary>Website navigation map</summary>
+<ul>
+<li><a href="#home">Home</a> → Report missing · Browse nearby · Manage active alerts</li>
+<li><a href="#browse">Browse</a> → Public report → Share · Follow · Send a sighting</li>
+<li><a href="#report">Report</a> → <a href="#missing">Missing animal</a> → Select pet → Publish &amp; share</li>
+<li>Report → <a href="#found">Found animal</a> (proposed) · <a href="#seen">Standalone sighting</a> (planned)</li>
+<li><a href="#following">Following</a> → Saved report → Open or unfollow</li>
+<li><a href="#profile">Profile</a> → My Animals · Past cases</li>
+</ul></details></div></footer>
+<dialog id="preview" aria-labelledby="preview-title"></dialog>
+<script>
+'use strict';
+const screen = document.querySelector('#screen');
+const selector = document.querySelector('#role');
+const preview = document.querySelector('#preview');
+const animals = [
+  {id:'luna',name:'Luna',type:'Dog',area:'Vincent, East London',description:'Tan and white dog with a dark muzzle and a blue collar.',photo:''}
+];
+const reports = [
+  {id:'hp-m-101',name:'Milo',type:'Cat',area:'Nahoon, East London',description:'Grey tabby with white paws. May hide under cars.',time:'This morning',whatsapp:true,owner:'sample',status:'missing',sightings:[]},
+  {id:'hp-m-102',name:'Pepper',type:'Dog',area:'Gonubie, East London',description:'Small black dog with a white chest and a red harness.',time:'Yesterday afternoon',whatsapp:false,owner:'sample',status:'missing',sightings:[]}
+];
+const demoSightings = [{area:'Near the park entrance',when:'Just now',note:'A similar animal headed towards the field.'}];
+const followed = {owner:new Set(),member:new Set()};
+let role = 'owner';
+let selection = 'luna';
+let newId = 103;
+let notice = '';
+let pendingShare = null;
+let resumeRoute = '';
+let missingDraft = {};
+let missingPetPhoto = '';
+const sightingDrafts = {};
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const link = (hash, label, primary=false) => '<a class="btn'+(primary?' primary':'')+'" href="#'+hash+'">'+label+'</a>';
+const button = (action,label,primary=false) => '<button type="button" class="btn'+(primary?' primary':'')+'" data-action="'+action+'">'+label+'</button>';
+const active = () => reports.filter(r => r.status === 'missing');
+const owned = () => reports.filter(r => r.owner === 'owner');
+const heading = (title,lead='') => '<h1 tabindex="-1">'+title+'</h1>'+(lead?'<p class="lead">'+lead+'</p>':'');
+const petPicture = pet => pet.photo ? '<img class="pet-photo" alt="" src="'+esc(pet.photo)+'">' : '<span class="pet-icon" aria-hidden="true">'+(pet.type==='Cat'?'🐈':pet.type==='Dog'?'🐕':'🐾')+'</span>';
+function go(route,message=''){
+  notice=message;
+  if(location.hash==='#'+route) render(true);
+  else location.hash=route;
+}
+function cards(items, empty){
+  return items.length ? '<div class="grid">'+items.map(r=>'<article class="card">'+petPicture(r)+'<span class="tag">'+({missing:'Missing',reunited:'Reunited',closed:'Closed'})[r.status]+'</span><h2>'+esc(r.name)+'</h2><p>'+esc(r.type)+' · '+esc(r.area)+'</p>'+link('alert/'+r.id,'View '+esc(r.name)+'’s alert')+'</article>').join('')+'</div>' : '<p>'+empty+'</p>';
+}
+function ownerCards(items){
+  return items.map(r=>'<article class="card"><h3>'+esc(r.name)+'</h3><p>'+esc(r.area)+' · '+r.sightings.length+' private sighting'+(r.sightings.length===1?'':'s')+'</p>'+link('manage/'+r.id,'Manage '+esc(r.name)+'’s alert')+'</article>').join('');
+}
+function home(){
+  const current=owned().filter(r=>r.status==='missing');
+  return '<section class="hero">'+heading('Find a missing animal','Post a missing alert or help an owner by sharing a report or sending a sighting.')+
+    '<div class="row">'+link('missing','Report my animal missing',true)+link('browse','Browse missing animals')+'</div></section>'+
+    (role==='owner'&&current.length?'<section class="section"><h2>My active alerts</h2><div class="grid">'+ownerCards(current)+'</div></section>':'')+
+    '<section class="section"><h2>Recent missing alerts</h2>'+cards(active().slice(0,3),'There are no open alerts.')+'</section>';
+}
+function browse(){
+  return heading('Browse missing animals','Find a public alert by animal name, area or report reference.')+
+    '<label class="field narrow">Search alerts<input id="search" type="search" placeholder="e.g. Nahoon or Milo"></label>'+
+    '<div id="results" aria-live="polite">'+cards(active(),'There are no open alerts.')+'</div>';
+}
+function report(){
+  return heading('Report an animal')+'<div class="grid section">'+
+    '<article class="card"><h2>My animal is missing</h2><p>Use your animal’s profile to publish and share an alert.</p>'+link('missing','Report missing',true)+'</article>'+
+    '<article class="card"><span class="tag">Proposed flow</span><h2>I found an animal</h2><p>The animal is safely in your care.</p>'+link('found','View Found flow')+'</article>'+
+    '<article class="card"><span class="tag">Planned</span><h2>I saw an animal</h2><p>The animal is still roaming and you haven’t found a matching alert.</p>'+link('seen','View standalone sighting flow')+'</article></div>';
+}
+function animalFields(pet={},prefix=''){
+  return '<label class="field">Animal name<input name="name" required maxlength="45" value="'+esc(pet.name)+'"></label>'+
+    '<label class="field">Type<select name="type">'+['Dog','Cat','Other'].map(type=>'<option'+(pet.type===type?' selected':'')+'>'+type+'</option>').join('')+'</select></label>'+
+    '<label class="field">Short description<input name="description" required maxlength="220" value="'+esc(pet.description)+'"></label>'+
+    (prefix==='inline'?'':'<label class="field">Usual area <small>Suburb and town</small><input name="area" required maxlength="90" value="'+esc(pet.area)+'"></label>')+
+    '<label class="field">Photo <small>Optional</small><input name="photo" type="file" accept="image/*"></label>';
+}
+function missing(){
+  if(role==='member') return heading('Report my animal missing','Select Pet owner in Demo view to try the reporting journey.')+link('browse','Browse alerts');
+  const open = new Set(owned().filter(r=>r.status==='missing').map(r=>r.animalId));
+  const eligible = animals.filter(a=>!open.has(a.id));
+  const pet = eligible.find(a=>a.id===selection)||(selection==='new'?null:eligible[0]);
+  selection=pet?.id||'new';
+  const area=missingDraft.area??pet?.area??'';
+  return heading('Report my animal missing','Check the public details, then publish and share.')+
+    '<form id="missing" class="card narrow section"><label class="field">Animal<select id="animal-choice">'+
+    eligible.map(a=>'<option value="'+a.id+'"'+(a.id===pet?.id?' selected':'')+'>'+esc(a.name)+'</option>').join('')+
+    '<option value="new"'+(!pet?' selected':'')+'>Add an animal now</option></select></label>'+
+    (pet?'<div class="card">'+petPicture(pet)+'<strong>'+esc(pet.name)+'</strong><p>'+esc(pet.description)+'</p></div>':animalFields(missingDraft,'inline'))+
+    '<label class="field">Last seen <small>Approximate is fine</small><input name="time" maxlength="90" placeholder="e.g. Today around 7 am" value="'+esc(missingDraft.time)+'"></label>'+
+    '<label class="field">Public last-seen area <small>Suburb and town only</small><input required name="area" maxlength="90" placeholder="e.g. Vincent, East London" value="'+esc(area)+'"></label>'+
+    '<details'+(missingDraft.extra?' open':'')+'><summary>Add details</summary><label class="field">Anything that might help? <small>Optional</small><textarea name="extra" maxlength="280" rows="2" placeholder="e.g. Wearing a red collar today">'+esc(missingDraft.extra)+'</textarea></label></details>'+
+    '<label class="check"><input name="whatsapp" type="checkbox"'+(missingDraft.whatsapp?' checked':'')+'>Allow WhatsApp contact on this report</label>'+
+    '<p class="small">People can send private in-app sightings. Choose WhatsApp only if you’re happy for the person messaging you to see your number.</p>'+
+    '<button class="btn primary">'+(role==='guest'?'Continue to demo sign-in':'Publish &amp; share')+'</button></form>';
+}
+function publicAlert(r){
+  const saved=followed[role]?.has(r.id);
+  const own=role==='owner'&&r.owner==='owner';
+  return '<a class="back" href="#browse">← Browse alerts</a>'+heading(esc(r.name)+'’s alert')+
+    '<article class="card narrow section">'+petPicture(r)+'<span class="tag">'+({missing:'Missing',reunited:'Reunited',closed:'Alert closed'})[r.status]+'</span>'+
+    '<dl class="facts"><dt>Last seen</dt><dd>'+esc(r.area)+' · '+esc(r.time)+'</dd><dt>Description</dt><dd>'+esc(r.description)+(r.extra?'<br>'+esc(r.extra):'')+'</dd><dt>Reference</dt><dd>'+r.id.toUpperCase()+'</dd></dl>'+
+    '<div class="row">'+(r.status==='missing'?(own?link('manage/'+r.id,'Manage alert',true):link('sighting/'+r.id,'I saw this animal',true)):'')+
+    button('share','Share alert')+((r.status==='missing'||saved)&&!own?button('follow',saved?'Unfollow':role==='guest'?'Sign in to follow':'Follow alert'):'')+'</div></article>';
+}
+function sighting(r){
+  if(r.status!=='missing')return heading('This alert has ended')+link('alert/'+r.id,'Back to alert');
+  if(role==='owner'&&r.owner==='owner')return heading('This is your alert','Switch to Signed-in neighbour in Demo view to try sending a sighting.')+link('manage/'+r.id,'Manage alert');
+  const draft=sightingDrafts[r.id]||{};
+  return '<a class="back" href="#alert/'+r.id+'">← '+esc(r.name)+'’s alert</a>'+heading('Send a sighting','Tell the owner where and when you saw an animal that might be '+esc(r.name)+'.')+
+    (r.whatsapp&&role!=='guest'?'<div class="row section">'+button('whatsapp','Preview WhatsApp message')+'</div>':'')+
+    '<form id="sighting" class="card narrow section"><h2>Private in-app sighting</h2>'+
+    '<label class="field">Where?<input required name="area" maxlength="160" placeholder="Street, landmark or suburb" value="'+esc(draft.area)+'"></label>'+
+    '<label class="field">When?<input required name="when" maxlength="90" value="'+esc(draft.when??'Just now')+'"></label>'+
+    '<label class="field">Short note <small>Optional</small><textarea name="note" maxlength="250" rows="2">'+esc(draft.note)+'</textarea></label>'+
+    '<button class="btn primary">'+(role==='guest'?'Continue to demo sign-in':'Send private sighting')+'</button></form>';
+}
+function manage(r){
+  if(role!=='owner'||r.owner!=='owner')return heading('Owner view','Select Pet owner in Demo view to manage a report you published in this session.')+link('alert/'+r.id,'Open public alert');
+  return heading('Manage '+esc(r.name)+'’s alert')+
+    '<div class="row section">'+link('alert/'+r.id,'View public alert')+button('share','Share again')+'</div>'+
+    '<section class="card narrow section"><h2>Private sightings</h2>'+
+    (r.sightings.length?'<ul>'+r.sightings.map(s=>'<li><strong>'+esc(s.area)+'</strong> · '+esc(s.when)+(s.note?'<br>'+esc(s.note):'')+'</li>').join('')+'</ul>':'<p>No sightings yet.</p>'+button('sample','Add a sample sighting'))+'</section>'+
+    (r.status==='missing'?'<section class="card narrow section"><h2>End this alert</h2><div class="row">'+button('reunited','Mark reunited',true)+button('closed','Close without reunion')+'</div></section>':'<p class="status section">'+(r.status==='reunited'?'Marked reunited.':'Closed without reunion.')+'</p>');
+}
+function following(){
+  if(role==='guest')return heading('Following','Sign in to save alerts and find them here.')+link('sign-in/following','Try demo sign-in',true);
+  return heading('Following','Your saved alerts, including any that have ended.')+cards(reports.filter(r=>followed[role].has(r.id)),'Open a public alert in Browse and select Follow alert.')+'<p class="section">'+link('browse','Browse alerts')+'</p>';
+}
+function profile(){
+  if(role==='guest')return heading('Profile','Sign in to manage your animals and reports.')+link('sign-in/profile','Try demo sign-in',true);
+  if(role==='member')return heading('Profile','You’re viewing the site as a signed-in neighbour.')+link('following','Open saved alerts');
+  return heading('Profile')+'<section class="section"><h2>My Animals</h2><div class="grid">'+animals.map(a=>'<article class="card">'+petPicture(a)+'<h3>'+esc(a.name)+'</h3><p>'+esc(a.type)+' · '+esc(a.area)+'</p>'+link('animal/'+a.id,'Edit animal profile')+'</article>').join('')+'</div><p>'+link('animal/new','Add an animal')+'</p></section>'+
+    '<section class="section"><h2>My alerts</h2>'+(owned().some(r=>r.status==='missing')?'<div class="grid">'+ownerCards(owned().filter(r=>r.status==='missing'))+'</div>':'<p>No active alerts.</p>')+'</section>'+
+    '<section class="section"><h2>Past cases</h2>'+(owned().some(r=>r.status!=='missing')?'<div class="grid">'+ownerCards(owned().filter(r=>r.status!=='missing'))+'</div>':'<p>No past cases yet.</p>')+'</section>';
+}
+function animalPage(id){
+  if(role!=='owner')return heading('My Animals','Select Pet owner in Demo view to try managing animal profiles.')+link('profile','Back to Profile');
+  const pet=animals.find(a=>a.id===id);
+  if(!pet&&id!=='new')return heading('Animal profile unavailable')+link('profile','Back to Profile');
+  return '<a class="back" href="#profile">← Profile</a>'+heading(pet?'Edit '+esc(pet.name)+'’s profile':'Add an animal')+
+  '<form id="animal" class="card narrow section">'+(pet?.photo?petPicture(pet):'')+animalFields(pet)+'<button class="btn primary">Save animal</button></form>';
+}
+function future(page){
+  const found=page==='found';
+  const title=found?'Found animal':'Standalone sighting';
+  const body=found?'<ol><li>Add a description, a photo if available and the general area where the animal was found.</li><li>Publish and share the Found alert. Keep the holding address private.</li><li>Ask privately for proof of ownership, arrange handover and mark reunited.</li></ol>':
+    '<ol><li>Enter the area, approximate time and a short description.</li><li>Add a photo if you have one.</li><li>Submit the sighting. A possible match can be shared privately for human review.</li></ol>';
+  return '<a class="back" href="#report">← Report</a>'+heading(title,'Future journey preview')+
+    '<section class="card narrow section">'+body+'<p class="small">'+(found?'Found publishing and ownership claims are planned. The documented work reaches a private draft.':'For an animal already listed, send a sighting from its public alert.')+'</p>'+link('browse','Browse current alerts')+'</section>';
+}
+function route(){
+  return (location.hash.slice(1)||'home').split('/');
+}
+function render(focus=false){
+  const [page,id]=route();
+  const r=reports.find(x=>x.id===id);
+  const direct={home,browse,report,missing,following,profile};
+  let content;
+  if(Object.hasOwn(direct,page))content=direct[page]();
+  else if(page==='animal')content=animalPage(id);
+  else if(page==='found'||page==='seen')content=future(page);
+  else if(page==='sign-in')content=heading('Try signing in','Use a demo account to continue. Your form details will be here when you return.')+
+    '<div class="row section">'+button('sign-in',id==='owner'?'Continue as pet owner':'Continue as neighbour',true)+'</div>';
+  else if(r&&['alert','sighting','manage'].includes(page))content=({alert:publicAlert,sighting,manage})[page](r);
+  else content=heading('Page unavailable','A report created in this prototype is only available during the current session.')+link('home','Go home');
+  screen.innerHTML=(notice?'<div class="status" role="status">'+esc(notice)+'</div>':'')+content;
+  notice='';
+  const navPage=({alert:'browse',sighting:'browse',missing:'report',found:'report',seen:'report',manage:'home',animal:'profile'})[page]||page;
+  document.querySelectorAll('.nav a').forEach(a=>a.getAttribute('href')==='#'+navPage?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  if(focus){window.scrollTo(0,0);screen.querySelector('h1')?.focus({preventScroll:true});}
+}
+function showDialog(title,body){
+  preview.innerHTML='<h2 id="preview-title">'+title+'</h2>'+body+'<form method="dialog"><button class="btn">Done</button></form>';
+  if(!preview.open)preview.showModal();
+}
+function share(r,published=false){
+  const message=r.name+' is missing · '+r.area+'\nLast seen: '+r.time+'\nReference: '+r.id.toUpperCase()+'\n[Public report link]';
+  showDialog(published?'Alert published in the prototype':'Share preview',
+    '<p>In the live flow, the share sheet would include a public report link.</p><p class="share-text">'+esc(message)+'</p><p>'+link('alert/'+r.id,'Open public alert',true)+'</p>');
+}
+function updateRole(next){
+  role=next;
+  selector.value=next;
+}
+function createProfile(data,photo,existing){
+  const record={id:existing?.id||'pet-'+(animals.length+1),name:data.name,type:data.type,area:data.area,description:data.description,photo:photo||existing?.photo||''};
+  if(existing)Object.assign(existing,record);
+  else animals.push(record);
+  return record;
+}
+window.addEventListener('hashchange',()=>{
+  if(preview.open)preview.close();
+  render(true);
+  if(pendingShare){share(pendingShare,true);pendingShare=null;}
+});
+selector.addEventListener('change',()=>{updateRole(selector.value);render();});
+screen.addEventListener('input',event=>{
+  if(event.target.id!=='search')return;
+  const q=event.target.value.trim().toLowerCase();
+  document.querySelector('#results').innerHTML=cards(active().filter(r=>[r.name,r.area,r.id,r.type].some(v=>v.toLowerCase().includes(q))),'No alerts match that search.');
+});
+screen.addEventListener('change',event=>{
+  if(event.target.id!=='animal-choice')return;
+  const data=new FormData(document.querySelector('#missing'));
+  selection=event.target.value;
+  missingDraft={time:data.get('time'),extra:data.get('extra'),whatsapp:data.has('whatsapp')};
+  render();
+  document.querySelector('#animal-choice').focus();
+});
+screen.addEventListener('submit',event=>{
+  event.preventDefault();
+  const form=event.target;
+  const data=Object.fromEntries(new FormData(form));
+  const [,id]=route();
+  const r=reports.find(x=>x.id===id);
+  const photo=data.photo?.size ? URL.createObjectURL(data.photo) : '';
+  delete data.photo;
+  for(const key of Object.keys(data)) data[key]=data[key].trim();
+  if(form.id==='animal'){
+    createProfile(data,photo,animals.find(a=>a.id===id));
+    go('profile','Animal profile saved.');
+  }
+  if(form.id==='missing'){
+    if(role==='guest'){
+      missingDraft=data;missingPetPhoto=photo||missingPetPhoto;resumeRoute='missing';go('sign-in/owner');return;
+    }
+    const pet=animals.find(a=>a.id===selection)||createProfile(data,photo||missingPetPhoto);
+    const record={...pet,id:'hp-m-'+newId++,animalId:pet.id,area:data.area,time:data.time||'Not sure',extra:data.extra,whatsapp:Boolean(data.whatsapp),status:'missing',owner:'owner',sightings:[]};
+    reports.unshift(record);
+    missingDraft={};missingPetPhoto='';
+    pendingShare=record;
+    go('manage/'+record.id);
+  }
+  if(form.id==='sighting'&&r){
+    if(role==='guest'){
+      sightingDrafts[id]=data;resumeRoute='sighting/'+id;go('sign-in/sighting');return;
+    }
+    r.sightings.push(data);
+    delete sightingDrafts[id];
+    go('alert/'+id,'Private sighting added in this demo.');
+  }
+});
+screen.addEventListener('click',event=>{
+  const action=event.target.closest('[data-action]')?.dataset.action;
+  if(!action)return;
+  const [page,id]=route();
+  const r=reports.find(x=>x.id===id);
+  if(action==='sign-in'){
+    updateRole(id==='owner'?'owner':'member');
+    const next=resumeRoute||id||'home';
+    resumeRoute='';
+    go(next);
+    return;
+  }
+  if(!r)return;
+  if(action==='share')share(r);
+  if(action==='follow'){
+    if(role==='guest'){resumeRoute='alert/'+id;go('sign-in/follow');return;}
+    const saved=followed[role];
+    if(saved.has(id)){saved.delete(id);go('alert/'+id,'Removed from Following.');}
+    else{saved.add(id);go('following','Alert saved.');}
+  }
+  if(action==='sample'){r.sightings.push({...demoSightings[0]});go('manage/'+id,'Sample sighting added.');}
+  if(action==='whatsapp')showDialog('WhatsApp message preview','<p class="share-text">Hi, I may have seen '+esc(r.name)+'. I saw the animal near ___ at ___.\nRef: '+r.id.toUpperCase()+'</p><p>This preview uses a sample message. No WhatsApp number is connected.</p>');
+  if(action==='reunited'||action==='closed'){
+    const title=action==='reunited'?'Mark '+esc(r.name)+' reunited?':'Close this alert without reunion?';
+    showDialog(title,'<p>This will remove the alert from Browse and keep the case in Profile.</p><p><button type="button" class="btn primary" id="confirm-status">Confirm</button></p>');
+    preview.querySelector('#confirm-status').onclick=()=>{r.status=action;preview.close();go(page+'/'+id,action==='reunited'?'Reunion recorded.':'Alert closed.');};
+  }
+});
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+/* Homeward Paws design tokens v1.1 (2026-11-17). GENERATED from tokens/tokens.json: edit that file, not this one. */
+
+:root {
+  --hp-primary: #227A71;
+  --hp-primary-bright: #2F9488;
+  --hp-primary-dark: #185C55;
+  --hp-primary-light: #E3F2EF;
+  --hp-primary-mid: #D3EAE5;
+  --hp-accent: #E8735F;
+  --hp-accent-light: #FCE9E4;
+  --hp-highlight: #E9B949;
+  --hp-highlight-light: #FBF3DC;
+  --hp-highlight-on-tint: #6B4E00;
+  --hp-background: #FBF7F2;
+  --hp-surface: #FFFFFF;
+  --hp-surface-muted: #F5EFE7;
+  --hp-text-primary: #1F2D3D;
+  --hp-text-secondary: #5E6B78;
+  --hp-text-on-primary: #FFFFFF;
+  --hp-text-on-dark-muted: #C9D3DC;
+  --hp-border: #ECE4DA;
+  --hp-overlay: rgba(31, 45, 61, 0.48);
+  --hp-error: #B3363C;
+  --hp-missing: #C8424A;
+  --hp-missing-tint: #FBE6E7;
+  --hp-missing-on-tint: #9A2A31;
+  --hp-found: #D97820;
+  --hp-found-tint: #FCEEDD;
+  --hp-found-on-tint: #8F4A0C;
+  --hp-sighting: #2F6FCE;
+  --hp-sighting-tint: #E3EDFB;
+  --hp-sighting-on-tint: #1D4E9A;
+  --hp-reunited: #2E8456;
+  --hp-reunited-tint: #E2F3E9;
+  --hp-reunited-on-tint: #1D5E3B;
+  --hp-partner: #7A5BB0;
+  --hp-partner-tint: #EEE7F7;
+  --hp-partner-on-tint: #55397F;
+  --hp-admin: #3E5057;
+  --hp-admin-tint: #E6EBED;
+  --hp-admin-on-tint: #2B3A40;
+
+  --hp-font-sans: Nunito, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --hp-font-script: 'Dancing Script', 'Segoe Script', cursive;
+  --hp-weight-regular: 400;
+  --hp-weight-semibold: 600;
+  --hp-weight-bold: 700;
+  --hp-weight-extrabold: 800;
+  --hp-weight-black: 900;
+
+  --hp-space-xs: 4px;
+  --hp-space-sm: 8px;
+  --hp-space-md: 12px;
+  --hp-space-lg: 16px;
+  --hp-space-xl: 20px;
+  --hp-space-xxl: 24px;
+  --hp-space-xxxl: 32px;
+  --hp-space-huge: 40px;
+  --hp-space-giant: 48px;
+
+  --hp-radius-sm: 10px;
+  --hp-radius-md: 14px;
+  --hp-radius-lg: 20px;
+  --hp-radius-xl: 28px;
+  --hp-radius-pill: 999px;
+  --hp-radius-circle: 50%;
+
+  --hp-shadow-card: 0 10px 30px rgba(31, 45, 61, 0.08);
+  --hp-shadow-raised: 0 24px 50px rgba(31, 45, 61, 0.18);
+
+  --hp-max-width: 1120px;
+  --hp-gutter: 20px;
+  --hp-section-padding: 72px;
+  --hp-button-min-height: 52px;
+}
+
+/* Aliases used by the live website stylesheet (site.css). Keep them so existing pages keep working. */
+:root {
+  --primary: var(--hp-primary); --primary-dark: var(--hp-primary-dark); --primary-light: var(--hp-primary-light); --primary-mid: var(--hp-primary-mid);
+  --accent: var(--hp-accent); --accent-light: var(--hp-accent-light); --highlight-light: var(--hp-highlight-light); --highlight-on: var(--hp-highlight-on-tint);
+  --bg: var(--hp-background); --surface: var(--hp-surface); --surface-muted: var(--hp-surface-muted);
+  --ink: var(--hp-text-primary); --ink-2: var(--hp-text-secondary); --on-dark: var(--hp-text-on-primary); --on-dark-2: var(--hp-text-on-dark-muted); --line: var(--hp-border);
+  --missing: var(--hp-missing); --missing-tint: var(--hp-missing-tint); --missing-on: var(--hp-missing-on-tint);
+  --found: var(--hp-found); --found-tint: var(--hp-found-tint); --found-on: var(--hp-found-on-tint);
+  --sighting: var(--hp-sighting); --sighting-tint: var(--hp-sighting-tint); --sighting-on: var(--hp-sighting-on-tint);
+  --reunited: var(--hp-reunited); --reunited-tint: var(--hp-reunited-tint); --reunited-on: var(--hp-reunited-on-tint);
+  --font: var(--hp-font-sans); --script: var(--hp-font-script);
+  --radius-sm: var(--hp-radius-sm); --radius-md: var(--hp-radius-md); --radius-lg: var(--hp-radius-lg); --radius-xl: var(--hp-radius-xl);
+  --shadow: var(--hp-shadow-card); --shadow-raised: var(--hp-shadow-raised);
+}
