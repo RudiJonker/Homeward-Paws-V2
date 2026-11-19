@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Text} from 'react-native';
 import {router} from 'expo-router';
-import {Screen,Button,Field,styles as s} from '../ui';
+import {Screen,Button,Field,PasswordField,styles as s} from '../ui';
 import {supabase} from '../supabase';
 import {useAuth} from '../auth';
 import {colors} from '../theme';
@@ -21,7 +21,7 @@ export default function Login(){
   }
   return <Screen title="Welcome back" lead="Log in to manage your animals and missing alerts.">
     <Field label="Email address" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email"/>
-    <Field label="Password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password"/>
+    <PasswordField label="Password" value={password} onChangeText={setPassword} autoComplete="current-password"/>
     {message?<Text style={[s.body,{color:colors.error}]}>{message}</Text>:null}
     <Button title={busy?'Logging in…':'Log in'} disabled={busy} onPress={submit}/>
   </Screen>;

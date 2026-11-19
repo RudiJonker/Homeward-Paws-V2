@@ -46,3 +46,4 @@ desktop.ini
 # generated native folders
 /ios
 /android
+/supabase/.temp/
