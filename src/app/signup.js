@@ -3,9 +3,11 @@ import {Text} from 'react-native';
 import {router} from 'expo-router';
 import {Screen,Button,Field,PasswordField,styles as s} from '../ui';
 import {supabase} from '../supabase';
+import {useAuth} from '../auth';
 import {colors} from '../theme';
 
 export default function Signup(){
+  const {setPendingVerificationEmail}=useAuth();
   const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
   async function submit(){
     const normalized=email.trim().toLowerCase();
@@ -16,7 +18,10 @@ export default function Signup(){
     const {data,error}=await supabase.auth.signUp({email:normalized,password});
     setBusy(false);
     if(error)return setMessage(error.message);
-    if(!data.session)return setMessage('Your account was created, but no active session was returned. Check whether email confirmation is enabled, then log in.');
+    if(!data.session){
+      await setPendingVerificationEmail(normalized);
+      return router.replace({pathname:'/verify-email',params:{email:normalized}});
+    }
     router.replace('/complete-profile');
   }
   return <Screen title="Create your account" lead="Join your community and help missing animals get home.">

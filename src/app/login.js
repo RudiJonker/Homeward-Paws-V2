@@ -7,12 +7,20 @@ import {useAuth} from '../auth';
 import {colors} from '../theme';
 
 export default function Login(){
-  const {pendingAction,setPendingAction}=useAuth();
+  const {pendingAction,setPendingAction,setPendingVerificationEmail}=useAuth();
   const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
   async function submit(){
     setBusy(true);setMessage('');
-    const {data,error}=await supabase.auth.signInWithPassword({email:email.trim().toLowerCase(),password});
-    if(error){setBusy(false);return setMessage(error.message)}
+    const normalized=email.trim().toLowerCase();
+    const {data,error}=await supabase.auth.signInWithPassword({email:normalized,password});
+    if(error){
+      setBusy(false);
+      if(error.code==='email_not_confirmed'){
+        await setPendingVerificationEmail(normalized);
+        return router.push({pathname:'/verify-email',params:{email:normalized}});
+      }
+      return setMessage(error.message);
+    }
     const {data:p,error:profileError}=await supabase.from('profiles').select('profile_completed').eq('id',data.user.id).maybeSingle();
     if(profileError){setBusy(false);return setMessage(`Signed in, but the profile could not be loaded: ${profileError.message}`)}
     const target=p?.profile_completed?(pendingAction?.route||'/home'):'/complete-profile';
