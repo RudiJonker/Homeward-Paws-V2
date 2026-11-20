@@ -1,4 +1,5 @@
 import {createContext,useCallback,useContext,useEffect,useMemo,useRef,useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAuth} from './auth';
 import {supabase} from './supabase';
 
@@ -29,16 +30,25 @@ export function StoreProvider({children}){
     const rows=await Promise.all(data.map(async animal=>{
       let photo=animal.animal_type?.toLowerCase()==='cat'?cat:dog;
       if(animal.photo_path){const {data:signed}=await supabase.storage.from('animal-photos').createSignedUrl(animal.photo_path,3600);if(signed?.signedUrl)photo={uri:signed.signedUrl}}
-      return {id:animal.id,name:animal.name,type:animal.animal_type,description:animal.description,area:animal.usual_area,photo,photoPath:animal.photo_path};
+      return {id:animal.id,name:animal.name,type:animal.animal_type,description:animal.description,area:animal.usual_area,province:animal.home_province||'',city:animal.home_city||'',suburb:animal.home_suburb||'',useOwnerLocation:animal.use_owner_location,photo,photoPath:animal.photo_path};
     }));
     if(activeUserId.current===requestedUserId)setAnimals(rows);
   },[userId]);
-  useEffect(()=>{setAnimals([]);setFollowing([]);if(userId)loadAnimals().catch(()=>{})},[userId,loadAnimals]);
+  useEffect(()=>{
+    setAnimals([]);setFollowing([]);
+    if(!userId)return;
+    loadAnimals().catch(()=>{});
+    const requestedUserId=userId;
+    AsyncStorage.getItem(`hpv2:following:${requestedUserId}`).then(saved=>{
+      if(activeUserId.current!==requestedUserId||!saved)return;
+      try{const parsed=JSON.parse(saved);if(Array.isArray(parsed))setFollowing(parsed)}catch{}
+    });
+  },[userId,loadAnimals]);
   const api=useMemo(()=>({
     role:session?'member':'guest',animals,alerts,following,loadAnimals,
     async saveAnimal(animal){
       if(!userId)throw new Error('Sign in to save an animal.');
-      const row={owner_id:userId,name:animal.name.trim(),animal_type:animal.type.trim(),description:animal.description.trim(),usual_area:animal.area.trim(),photo_path:animal.photoPath||null};
+      const row={owner_id:userId,name:animal.name.trim(),animal_type:animal.type.trim(),description:animal.description.trim(),usual_area:animal.area.trim(),home_province:animal.location.province.trim(),home_city:animal.location.city.trim(),home_suburb:animal.location.suburb.trim(),use_owner_location:animal.useOwnerLocation,photo_path:animal.photoPath||null};
       const query=animal.id&&animal.id!=='new'?supabase.from('animals').update(row).eq('id',animal.id).eq('owner_id',userId).select().single():supabase.from('animals').insert(row).select().single();
       const {data,error}=await query;if(error)throw error;await loadAnimals();return data.id;
     },
@@ -49,7 +59,14 @@ export function StoreProvider({children}){
       await loadAnimals();
     },
     publish(data){if(!userId)throw new Error('Sign in to publish.');const animal=animals.find(item=>item.id===data.animalId),id=makeReference(alerts);setAlerts(current=>[{...animal,...data,id,ownerId:userId,status:'missing',sightings:[]},...current]);return id},
-    toggleFollow(id){setFollowing(current=>current.includes(id)?current.filter(value=>value!==id):[...current,id])},
+    toggleFollow(id){
+      if(!userId)return;
+      setFollowing(current=>{
+        const next=current.includes(id)?current.filter(value=>value!==id):[...current,id];
+        AsyncStorage.setItem(`hpv2:following:${userId}`,JSON.stringify(next)).catch(()=>{});
+        return next;
+      });
+    },
     addSighting(id,sighting){setAlerts(current=>current.map(alert=>alert.id===id?{...alert,sightings:[...alert.sightings,sighting]}:alert))},
     endAlert(id,status){setAlerts(current=>current.map(alert=>alert.id===id?{...alert,status}:alert))},
     clearPrivate(){setAnimals([]);setFollowing([])},

@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Alert,Image,Modal,Pressable,StyleSheet,Text,View} from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {router} from 'expo-router';
-import {Screen,Button,styles as s} from '../../ui';
+import {Screen,Button,Status,styles as s} from '../../ui';
 import {useStore} from '../../store';
 import {useAuth} from '../../auth';
 import {supabase} from '../../supabase';
@@ -11,7 +11,7 @@ import {colors,radius,spacing} from '../../theme';
 function MenuItem({icon,label,onPress,danger,disabled}){return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={({pressed})=>[local.menuItem,pressed&&{opacity:.65},disabled&&{opacity:.45}]}><MaterialCommunityIcons name={icon} size={23} color={danger?colors.error:colors.primary}/><Text style={[s.body,{flex:1,color:danger?colors.error:colors.text}]}>{label}</Text><MaterialCommunityIcons name="chevron-right" size={23} color={colors.muted}/></Pressable>}
 
 export default function Profile(){
-  const {animals}=useStore();
+  const {animals,alerts}=useStore();
   const {session,profile,signOut}=useAuth();
   const [menuOpen,setMenuOpen]=useState(false),[deleting,setDeleting]=useState(false);
   if(!session)return <Screen title="Profile" lead="Sign in to manage your private profile and animals."><Button title="Log in" onPress={()=>router.push('/login')}/><Button title="Create account" kind="secondary" onPress={()=>router.push('/signup')}/></Screen>;
@@ -43,7 +43,7 @@ export default function Profile(){
     <Screen>
       <View style={local.header}><Text style={s.h1}>{profile?.display_name||session.user.email}</Text><Pressable accessibilityRole="button" accessibilityLabel="Open profile menu" onPress={()=>setMenuOpen(true)} style={local.menuButton}><MaterialCommunityIcons name="menu" size={30} color={colors.text}/></Pressable></View>
       <Text style={s.h2}>My Animals</Text>
-      {animals.map(animal=><Pressable key={animal.id} style={[s.card,s.listCard]} onPress={()=>router.push(`/animal/${animal.id}`)}><Image source={animal.photo} style={s.thumbnail}/><View style={s.listBody}><Text style={s.h2}>{animal.name}</Text><Text style={s.body} numberOfLines={2}>{animal.type} · {animal.area}</Text></View><MaterialCommunityIcons name="chevron-right" size={28} color={colors.muted}/></Pressable>)}
+      {animals.map(animal=>{const status=alerts.some(item=>item.animalId===animal.id&&item.ownerId===session.user.id&&item.status==='missing')?'missing':'safe';return <Pressable key={animal.id} style={[s.card,s.listCard]} onPress={()=>router.push(`/animal/${animal.id}`)}><Image source={animal.photo} style={s.thumbnail}/><View style={s.listBody}><Text style={s.h2}>{animal.name}</Text><Text style={s.body} numberOfLines={2}>{animal.type} · {animal.area}</Text><Status value={status}/></View><MaterialCommunityIcons name="chevron-right" size={28} color={colors.muted}/></Pressable>})}
       {!animals.length?<Text style={s.body}>No animals saved yet.</Text>:null}
     </Screen>
     <Modal visible={menuOpen} transparent animationType="fade" statusBarTranslucent onRequestClose={()=>setMenuOpen(false)}>
@@ -51,6 +51,7 @@ export default function Profile(){
         <View style={local.menuHeader}><Text style={s.h2}>Profile menu</Text><Pressable accessibilityRole="button" accessibilityLabel="Close profile menu" onPress={()=>setMenuOpen(false)} hitSlop={8}><MaterialCommunityIcons name="close" size={27} color={colors.text}/></Pressable></View>
         <MenuItem icon="account-edit-outline" label="Edit my profile" onPress={()=>go('/complete-profile')}/>
         <MenuItem icon="paw" label="Add an animal" onPress={()=>go('/animal/new')}/>
+        <MenuItem icon="alert-circle-outline" label="My reports" onPress={()=>go('/my-reports')}/>
         <MenuItem icon="history" label="Past cases" onPress={()=>go('/past-cases')}/>
         <View style={local.divider}/>
         <MenuItem icon="logout" label="Log out" onPress={async()=>{setMenuOpen(false);await signOut();router.replace('/')}}/>

@@ -16,8 +16,9 @@ export default function Login(){
     const {data:p,error:profileError}=await supabase.from('profiles').select('profile_completed').eq('id',data.user.id).maybeSingle();
     if(profileError){setBusy(false);return setMessage(`Signed in, but the profile could not be loaded: ${profileError.message}`)}
     const target=p?.profile_completed?(pendingAction?.route||'/home'):'/complete-profile';
+    const destination=pendingAction?.draft?{pathname:target,params:pendingAction.draft}:target;
     if(p?.profile_completed)await setPendingAction(null);
-    setBusy(false);router.replace(target);
+    setBusy(false);router.replace(destination);
   }
   return <Screen title="Welcome back" lead="Log in to manage your animals and missing alerts.">
     <Field label="Email address" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email"/>

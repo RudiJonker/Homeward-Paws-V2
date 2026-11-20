@@ -30,7 +30,14 @@
           "photosPermission": "Choose an animal photo for its profile.",
           "microphonePermission": false
         }
-      ]
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Homeward Paws to detect your general province, city and suburb. Exact coordinates are not saved."
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ]
   }
 }

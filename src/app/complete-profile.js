@@ -7,31 +7,39 @@ import {useAuth} from '../auth';
 import {supabase} from '../supabase';
 import {uploadImage} from '../uploads';
 import {formatMobile,isSouthAfricanMobile,mobileDigits} from '../mobile';
+import LocationFields from '../components/LocationFields';
+import {formatGeneralLocation,splitGeneralLocation} from '../location';
 import {colors} from '../theme';
 
 export default function CompleteProfile(){
   const {session,profile,refreshProfile,pendingAction,setPendingAction}=useAuth();
   const [name,setName]=useState(profile?.display_name||'');
   const [mobile,setMobile]=useState(formatMobile(profile?.mobile||''));
-  const [area,setArea]=useState(profile?.home_area||'');
+  const [location,setLocation]=useState(()=>splitGeneralLocation(profile));
   const [photo,setPhoto]=useState(null);
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
-  useEffect(()=>{if(profile){setName(profile.display_name||'');setMobile(formatMobile(profile.mobile||''));setArea(profile.home_area||'')}},[profile]);
+  useEffect(()=>{if(profile){setName(profile.display_name||'');setMobile(formatMobile(profile.mobile||''));setLocation(splitGeneralLocation(profile))}},[profile]);
   async function pick(){const result=await ImagePicker.launchImageLibraryAsync({mediaTypes:['images'],allowsEditing:true,aspect:[1,1],quality:.8,base64:true});if(!result.canceled)setPhoto({...result.assets[0],mimeType:'image/jpeg'})}
   async function save(){
     if(busy)return;
     if(!name.trim())return setMessage('Display name is required.');
     if(!isSouthAfricanMobile(mobile))return setMessage('Enter a valid South African mobile number, for example 082 123 4567.');
+    if(!location.province.trim()||!location.city.trim()||!location.suburb.trim())return setMessage('Province, city or town, and suburb are required.');
     const isEditing=Boolean(profile?.profile_completed);
     setBusy(true);setMessage('');
     try{
       let avatarPath=profile?.avatar_path||null;
       if(photo){avatarPath=`${session.user.id}/avatar.jpg`;await uploadImage('avatars',avatarPath,photo)}
-      const {error}=await supabase.from('profiles').update({display_name:name.trim(),mobile:mobileDigits(mobile),home_area:area.trim()||null,avatar_path:avatarPath,profile_completed:true}).eq('id',session.user.id);
+      const {error}=await supabase.from('profiles').update({
+        display_name:name.trim(),mobile:mobileDigits(mobile),
+        home_province:location.province.trim(),home_city:location.city.trim(),home_suburb:location.suburb.trim(),
+        home_area:formatGeneralLocation(location),avatar_path:avatarPath,profile_completed:true,
+      }).eq('id',session.user.id);
       if(error)throw error;
       await refreshProfile(session.user.id);
       const target=pendingAction?.route||'/home';
+      const destination=pendingAction?.draft?{pathname:target,params:pendingAction.draft}:target;
       await setPendingAction(null);
       if(isEditing){
         Alert.alert(
@@ -41,7 +49,7 @@ export default function CompleteProfile(){
           {cancelable:false},
         );
       }else{
-        router.replace(target);
+        router.replace(destination);
       }
     }catch(error){setMessage(error.message)}finally{setBusy(false)}
   }
@@ -51,7 +59,7 @@ export default function CompleteProfile(){
     <Button title="Choose profile photo (optional)" kind="secondary" onPress={pick}/>
     <Field label="Display name" value={name} onChangeText={setName}/>
     <Field label="South African mobile number" value={mobile} onChangeText={value=>setMobile(formatMobile(value))} keyboardType="phone-pad" maxLength={12} placeholder="082 123 4567"/>
-    <Field label="Home suburb or town (optional)" value={area} onChangeText={setArea}/>
+    <LocationFields value={location} onChange={setLocation}/>
     {message?<Text style={[s.body,{color:colors.error}]}>{message}</Text>:null}
     <Button title={busy?'Saving…':'Save profile'} disabled={busy} onPress={save}/>
   </Screen>;
