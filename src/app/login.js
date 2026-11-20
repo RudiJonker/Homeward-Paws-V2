@@ -25,5 +25,6 @@ export default function Login(){
     <PasswordField label="Password" value={password} onChangeText={setPassword} autoComplete="current-password"/>
     {message?<Text style={[s.body,{color:colors.error}]}>{message}</Text>:null}
     <Button title={busy?'Logging in…':'Log in'} disabled={busy} onPress={submit}/>
+    <Button title="Forgot password?" kind="secondary" disabled={busy} onPress={()=>router.push('/forgot-password')}/>
   </Screen>;
 }

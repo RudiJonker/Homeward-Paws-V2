@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {Image,KeyboardAvoidingView,Platform,Pressable,ScrollView,StyleSheet,Text,TextInput,View} from 'react-native';
+import {useEffect,useState} from 'react';
+import {Image,Keyboard,KeyboardAvoidingView,Platform,Pressable,ScrollView,StyleSheet,Text,TextInput,View} from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {router,useSegments} from 'expo-router';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -10,8 +10,15 @@ const navItems=[['home','home','Home'],['browse','magnify','Browse'],['report','
 function DetailTabs(){const insets=useSafeAreaInsets();return <View style={[s.detailTabs,{paddingBottom:Math.max(insets.bottom,8)}]}>{navItems.map(([route,icon,label])=><Pressable key={route} style={s.detailTab} onPress={()=>router.replace(`/${route}`)}><MaterialCommunityIcons name={icon} size={route==='report'?28:24} color={colors.muted}/><Text style={s.detailTabText}>{label}</Text></Pressable>)}</View>}
 export function Screen({children,title,lead}){
   const segments=useSegments(),{session,profile}=useAuth(),inTabs=segments[0]==='(tabs)',isRequiredProfile=segments[0]==='complete-profile'&&!profile?.profile_completed,showTabs=!inTabs&&!!session&&!isRequiredProfile;
+  const [keyboardVisible,setKeyboardVisible]=useState(false);
+  useEffect(()=>{
+    const show=Keyboard.addListener('keyboardDidShow',()=>setKeyboardVisible(true));
+    const hide=Keyboard.addListener('keyboardDidHide',()=>setKeyboardVisible(false));
+    return()=>{show.remove();hide.remove()};
+  },[]);
+  const bottomPadding=keyboardVisible?(showTabs?180:140):(showTabs?96:48);
   return <KeyboardAvoidingView style={s.screen} behavior={Platform.OS==='ios'?'padding':'height'} keyboardVerticalOffset={Platform.OS==='ios'?88:0}>
-    <ScrollView style={s.screen} contentContainerStyle={[s.content,showTabs&&{paddingBottom:96}]} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets>
+    <ScrollView style={s.screen} contentContainerStyle={[s.content,{paddingBottom:bottomPadding}]} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets>
       {title&&<Text style={s.h1}>{title}</Text>}{lead&&<Text style={s.lead}>{lead}</Text>}{children}
     </ScrollView>
     {showTabs?<DetailTabs/>:null}
