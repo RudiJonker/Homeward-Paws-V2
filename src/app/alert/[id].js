@@ -16,7 +16,7 @@ export default function PublicAlert(){
   }
   async function follow(){
     if(!session){await setPendingAction({route:`/alert/${alert.id}`,action:'follow'});router.push('/login');return}
-    toggleFollow(alert.id);
+    await toggleFollow(alert.id);
   }
   return <Screen title={title} lead={`Public alert · ${alert.id}`}>
     <Image source={alert.photo} style={s.photo}/>

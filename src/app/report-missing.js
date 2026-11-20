@@ -17,6 +17,7 @@ export default function Missing(){
   const [lastSeenAt,setLastSeenAt]=useState(validDate(params.lastSeenAt));
   const [location,setLocation]=useState({province:params.province||'',city:params.city||'',suburb:params.suburb||''});
   const [extra,setExtra]=useState(params.extra||''),[notSure,setNotSure]=useState(params.notSure==='true'),[whatsapp,setWhatsapp]=useState(params.whatsapp==='true');
+  const [message,setMessage]=useState(''),[busy,setBusy]=useState(false);
   const animal=animals.find(item=>item.id===animalId);
   useEffect(()=>{if(!animalId&&animals.length)setAnimalId(animals[0].id)},[animals,animalId]);
   useEffect(()=>{if(animal&&!location.province&&!location.city&&!location.suburb)setLocation({province:animal.province||'',city:animal.city||'',suburb:animal.suburb||''})},[animal,location]);
@@ -32,8 +33,11 @@ export default function Missing(){
     if(!animal)return;
     const area=formatGeneralLocation(location);
     if(!location.province.trim()||!location.city.trim()||!location.suburb.trim())return;
-    const id=publish({animalId,lastSeen:notSure?'Not sure':formatLastSeen(lastSeenAt),lastSeenAt:notSure?null:lastSeenAt.toISOString(),area,province:location.province.trim(),city:location.city.trim(),suburb:location.suburb.trim(),extra,whatsapp});
-    router.replace(`/alert/${id}`);
+    setBusy(true);setMessage('');
+    try{
+      const id=await publish({animalId,lastSeen:notSure?'Not sure':formatLastSeen(lastSeenAt),lastSeenAt:notSure?null:lastSeenAt.toISOString(),area,province:location.province.trim(),city:location.city.trim(),suburb:location.suburb.trim(),extra,whatsapp});
+      router.replace(`/alert/${id}`);
+    }catch(error){setMessage(error.message);setBusy(false)}
   }
   function addAnimal(){
     if(!session)return requireLogin();
@@ -52,6 +56,7 @@ export default function Missing(){
     <Field label="Extra details (optional)" value={extra} onChangeText={setExtra} multiline/>
     <Button title={whatsapp?'WhatsApp contact enabled':'Enable WhatsApp contact (optional)'} kind="secondary" onPress={()=>setWhatsapp(value=>!value)}/>
     <Text style={s.muted}>If enabled, neighbours can open a prefilled message. Your private profile number is never shown publicly.</Text>
-    <Button title="Publish alert" icon="alert-circle" disabled={!animal||!locationComplete} onPress={submit}/>
+    {message?<Text style={[s.body,{color:colors.error}]}>{message}</Text>:null}
+    <Button title={busy?'Publishing…':'Publish alert'} icon="alert-circle" disabled={busy||!animal||!locationComplete} onPress={submit}/>
   </Screen>;
 }
