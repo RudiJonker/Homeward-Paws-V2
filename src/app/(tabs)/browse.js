@@ -27,7 +27,7 @@ function SelectField({label,value,options,allLabel,onChange,disabled}){
 }
 
 export default function Browse(){
-  const {alerts}=useStore(),{profile}=useAuth(),profileLocation=splitGeneralLocation(profile);
+  const {alerts,foundReports,sightedReports}=useStore(),{profile}=useAuth(),profileLocation=splitGeneralLocation(profile);
   const [view,setView]=useState('missing');
   const [q,setQ]=useState(''),[scope,setScope]=useState('all'),[searchOpen,setSearchOpen]=useState(true),[moreOpen,setMoreOpen]=useState(false);
   const [province,setProvince]=useState(''),[city,setCity]=useState(''),[suburb,setSuburb]=useState(''),[animalType,setAnimalType]=useState('All'),[dateRange,setDateRange]=useState('all');
@@ -86,7 +86,7 @@ export default function Browse(){
     <Text style={s.muted}>{shown.length} missing {shown.length===1?'animal':'animals'} found</Text>
     {shown.map(alert=><AlertCard key={alert.id} alert={alert} onPress={()=>router.push(`/alert/${alert.id}`)}/>)}
     {!shown.length?<View style={local.empty}><MaterialCommunityIcons name="map-search-outline" size={38} color={colors.muted}/><Text style={s.h2}>No missing animals match these filters.</Text><Text style={s.muted}>Try a wider area, a longer date range or reset the filters.</Text></View>:null}
-    </>:<View style={local.empty}><MaterialCommunityIcons name={view==='found'?'home-search-outline':'eye-outline'} size={38} color={colors.muted}/><Text style={s.h2}>No {view} animal reports yet.</Text><Text style={s.muted}>{view==='found'?'Found animals reported by the community will appear here.':'Standalone animal sightings will appear here.'}</Text></View>}
+    </>:view==='found'?<>{foundReports.map(report=><AlertCard key={report.id} alert={report} onPress={()=>router.push(`/found/${report.id}`)}/>)}{!foundReports.length?<View style={local.empty}><MaterialCommunityIcons name="home-search-outline" size={38} color={colors.muted}/><Text style={s.h2}>No found animal reports yet.</Text><Text style={s.muted}>Found animals reported by the community will appear here.</Text></View>:null}</>:<>{sightedReports.map(report=><AlertCard key={report.id} alert={report} onPress={()=>router.push(`/sighted/${report.id}`)}/>)}{!sightedReports.length?<View style={local.empty}><MaterialCommunityIcons name="eye-outline" size={38} color={colors.muted}/><Text style={s.h2}>No sighted animal reports yet.</Text><Text style={s.muted}>Standalone animal sightings will appear here.</Text></View>:null}</>}
   </Screen>;
 }
 

@@ -14,7 +14,7 @@ async function signedAnimalPhoto(path,type){
 
 export function StoreProvider({children}){
   const {session}=useAuth(),userId=session?.user.id||null,activeUserId=useRef(userId);
-  const [animals,setAnimals]=useState([]),[alerts,setAlerts]=useState([]),[following,setFollowing]=useState([]);
+  const [animals,setAnimals]=useState([]),[alerts,setAlerts]=useState([]),[foundReports,setFoundReports]=useState([]),[sightedReports,setSightedReports]=useState([]),[following,setFollowing]=useState([]);
   useEffect(()=>{activeUserId.current=userId},[userId]);
 
   const loadAnimals=useCallback(async()=>{
@@ -69,14 +69,48 @@ export function StoreProvider({children}){
     if(activeUserId.current===requestedUserId){setAlerts(rows);setFollowing(followRows.map(item=>item.alert_reference))}
   },[userId]);
 
+  const loadFoundReports=useCallback(async()=>{
+    let contactRows=[];
+    if(userId){const {data:contacts,error:contactError}=await supabase.from('found_report_contacts').select('*').order('created_at',{ascending:true});if(contactError)throw contactError;contactRows=contacts||[]}
+    const {data,error}=await supabase.from('found_reports').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    const rows=await Promise.all((data||[]).map(async report=>({
+      databaseId:report.id,id:report.reference,ownerId:report.reporter_id,ownerName:report.reporter_display_name||'Homeward Paws member',
+      name:'Found animal',type:report.animal_type,description:report.description,
+      area:[report.suburb,report.city,report.province].filter(Boolean).join(', '),province:report.province,city:report.city,suburb:report.suburb,
+      foundAt:report.found_at,foundWhen:new Date(report.found_at).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}),createdAt:report.created_at,
+      extra:report.location_details,status:report.status,photoPath:report.photo_path,photo:await signedAnimalPhoto(report.photo_path,report.animal_type),
+      contacts:contactRows.filter(item=>item.report_reference===report.reference),
+    })));
+    setFoundReports(rows);
+  },[userId]);
+
+  const loadSightedReports=useCallback(async()=>{
+    let contactRows=[];
+    if(userId){const {data:contacts,error:contactError}=await supabase.from('sighted_report_contacts').select('*').order('created_at',{ascending:true});if(contactError)throw contactError;contactRows=contacts||[]}
+    const {data,error}=await supabase.from('sighted_reports').select('*').order('created_at',{ascending:false});if(error)throw error;
+    const rows=await Promise.all((data||[]).map(async report=>({
+      databaseId:report.id,id:report.reference,ownerId:report.reporter_id,ownerName:report.reporter_display_name||'Homeward Paws member',name:'Sighted animal',type:report.animal_type,description:report.description,
+      area:[report.suburb,report.city,report.province].filter(Boolean).join(', '),province:report.province,city:report.city,suburb:report.suburb,
+      sightedAt:report.sighted_at,sightedWhen:new Date(report.sighted_at).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}),createdAt:report.created_at,
+      extra:report.location_details,status:report.status,photoPath:report.photo_path,photo:await signedAnimalPhoto(report.photo_path,report.animal_type),contacts:contactRows.filter(item=>item.report_reference===report.reference),
+    })));
+    setSightedReports(rows);
+  },[userId]);
+
   useEffect(()=>{
     setAnimals([]);setFollowing([]);
     if(userId)loadAnimals().catch(()=>{});
-    loadAlerts().catch(()=>{});
-  },[userId,loadAnimals,loadAlerts]);
+    loadAlerts().catch(()=>{});loadFoundReports().catch(()=>{});loadSightedReports().catch(()=>{});
+  },[userId,loadAnimals,loadAlerts,loadFoundReports,loadSightedReports]);
+
+  const pendingContactCount=userId?
+    alerts.filter(item=>item.ownerId===userId).reduce((total,item)=>total+item.sightings.filter(response=>response.contactStatus==='pending').length,0)+
+    foundReports.filter(item=>item.ownerId===userId).reduce((total,item)=>total+item.contacts.filter(request=>request.contact_status==='pending').length,0)+
+    sightedReports.filter(item=>item.ownerId===userId).reduce((total,item)=>total+item.contacts.filter(request=>request.contact_status==='pending').length,0):0;
 
   const api=useMemo(()=>({
-    role:session?'member':'guest',animals,alerts,following,loadAnimals,loadAlerts,
+    role:session?'member':'guest',animals,alerts,foundReports,sightedReports,following,pendingContactCount,loadAnimals,loadAlerts,loadFoundReports,loadSightedReports,
     async saveAnimal(animal){
       if(!userId)throw new Error('Sign in to save an animal.');
       const row={owner_id:userId,name:animal.name.trim(),animal_type:animal.type.trim(),description:animal.description.trim(),usual_area:animal.area.trim(),home_province:animal.location.province.trim(),home_city:animal.location.city.trim(),home_suburb:animal.location.suburb.trim(),use_owner_location:animal.useOwnerLocation,photo_path:animal.photoPath||null,photo_paths:animal.photoPaths,breed:animal.breed.trim(),colours:animal.colours,sex:animal.sex,approximate_age:Number(animal.age),age_unit:animal.ageUnit,identifiable_features:animal.features.trim(),has_medical_requirements:animal.hasMedical,medical_requirements:animal.hasMedical?animal.medical.trim():'',chipped:animal.chipped,approach_guidance:animal.approach};
@@ -97,6 +131,28 @@ export function StoreProvider({children}){
       const {data,error}=await supabase.from('missing_alerts').insert(row).select('reference').single();if(error)throw error;
       await loadAlerts();return data.reference;
     },
+    async publishFound(report){
+      if(!userId)throw new Error('Sign in to publish.');
+      const {data,error}=await supabase.from('found_reports').insert({reporter_id:userId,animal_type:report.type,description:report.description,photo_path:report.photoPath,found_at:report.foundAt,province:report.location.province.trim(),city:report.location.city.trim(),suburb:report.location.suburb.trim(),location_details:report.details}).select('reference').single();
+      if(error)throw error;await loadFoundReports();return data.reference;
+    },
+    async publishSighted(report){
+      if(!userId)throw new Error('Sign in to publish.');
+      const {data,error}=await supabase.from('sighted_reports').insert({reporter_id:userId,animal_type:report.type,description:report.description,photo_path:report.photoPath,sighted_at:report.sightedAt,province:report.location.province.trim(),city:report.location.city.trim(),suburb:report.location.suburb.trim(),location_details:report.details}).select('reference').single();
+      if(error)throw error;await loadSightedReports();return data.reference;
+    },
+    async requestSightedContact(reference){
+      if(!userId)throw new Error('Sign in to request contact.');
+      const {error}=await supabase.from('sighted_report_contacts').insert({report_reference:reference,requester_id:userId});
+      if(error?.code==='23505')throw new Error('You have already asked the reporter to contact you.');
+      if(error)throw error;await loadSightedReports();
+    },
+    async requestFoundContact(reference){
+      if(!userId)throw new Error('Sign in to request contact.');
+      const {error}=await supabase.from('found_report_contacts').insert({report_reference:reference,requester_id:userId});
+      if(error?.code==='23505')throw new Error('You have already asked the finder to contact you.');
+      if(error)throw error;await loadFoundReports();
+    },
     async toggleFollow(reference){
       if(!userId)throw new Error('Sign in to follow an alert.');
       if(following.includes(reference)){const {error}=await supabase.from('alert_follows').delete().eq('user_id',userId).eq('alert_reference',reference);if(error)throw error}
@@ -114,7 +170,7 @@ export function StoreProvider({children}){
       await loadAlerts();
     },
     clearPrivate(){setAnimals([]);setFollowing([])},
-  }),[session,userId,animals,alerts,following,loadAnimals,loadAlerts]);
+  }),[session,userId,animals,alerts,foundReports,sightedReports,following,pendingContactCount,loadAnimals,loadAlerts,loadFoundReports,loadSightedReports]);
   return <C.Provider value={api}>{children}</C.Provider>;
 }
 export const useStore=()=>useContext(C);
