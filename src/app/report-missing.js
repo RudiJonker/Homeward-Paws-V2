@@ -16,7 +16,7 @@ export default function Missing(){
   const [animalId,setAnimalId]=useState(params.selectedAnimalId||animals[0]?.id);
   const [lastSeenAt,setLastSeenAt]=useState(validDate(params.lastSeenAt));
   const [location,setLocation]=useState({province:params.province||'',city:params.city||'',suburb:params.suburb||''});
-  const [extra,setExtra]=useState(params.extra||''),[notSure,setNotSure]=useState(params.notSure==='true'),[whatsapp,setWhatsapp]=useState(params.whatsapp==='true');
+  const [extra,setExtra]=useState(params.extra||''),[notSure,setNotSure]=useState(params.notSure==='true');
   const [message,setMessage]=useState(''),[busy,setBusy]=useState(false);
   const animal=animals.find(item=>item.id===animalId);
   useEffect(()=>{if(!animalId&&animals.length)setAnimalId(animals[0].id)},[animals,animalId]);
@@ -26,7 +26,7 @@ export default function Missing(){
     setAnimalId(id);
     setLocation({province:selected?.province||'',city:selected?.city||'',suburb:selected?.suburb||''});
   }
-  function draft(){return {lastSeenAt:lastSeenAt.toISOString(),province:location.province,city:location.city,suburb:location.suburb,extra,notSure,whatsapp}}
+  function draft(){return {lastSeenAt:lastSeenAt.toISOString(),province:location.province,city:location.city,suburb:location.suburb,extra,notSure}}
   async function requireLogin(){await setPendingAction({route:'/report-missing',draft:draft()});router.push('/login')}
   async function submit(){
     if(!session)return requireLogin();
@@ -35,13 +35,13 @@ export default function Missing(){
     if(!location.province.trim()||!location.city.trim()||!location.suburb.trim())return;
     setBusy(true);setMessage('');
     try{
-      const id=await publish({animalId,lastSeen:notSure?'Not sure':formatLastSeen(lastSeenAt),lastSeenAt:notSure?null:lastSeenAt.toISOString(),area,province:location.province.trim(),city:location.city.trim(),suburb:location.suburb.trim(),extra,whatsapp});
+      const id=await publish({animalId,lastSeen:notSure?'Not sure':formatLastSeen(lastSeenAt),lastSeenAt:notSure?null:lastSeenAt.toISOString(),area,province:location.province.trim(),city:location.city.trim(),suburb:location.suburb.trim(),extra});
       router.replace(`/alert/${id}`);
     }catch(error){setMessage(error.message);setBusy(false)}
   }
   function addAnimal(){
     if(!session)return requireLogin();
-    router.push({pathname:'/animal/new',params:{returnTo:'report',...draft(),notSure:String(notSure),whatsapp:String(whatsapp)}});
+    router.push({pathname:'/animal/new',params:{returnTo:'report',...draft(),notSure:String(notSure)}});
   }
   const locationComplete=location.province.trim()&&location.city.trim()&&location.suburb.trim();
   return <Screen title="Publish a missing alert" lead="Check the public details, then share it quickly.">
@@ -54,8 +54,6 @@ export default function Missing(){
     <Button title={notSure?'Choose date and time':'Not sure'} kind="secondary" onPress={()=>setNotSure(value=>!value)}/>
     <LocationFields title="Last-seen location" value={location} onChange={setLocation}/>
     <Field label="Extra details (optional)" value={extra} onChangeText={setExtra} multiline/>
-    <Button title={whatsapp?'WhatsApp contact enabled':'Enable WhatsApp contact (optional)'} kind="secondary" onPress={()=>setWhatsapp(value=>!value)}/>
-    <Text style={s.muted}>If enabled, neighbours can open a prefilled message. Your private profile number is never shown publicly.</Text>
     {message?<Text style={[s.body,{color:colors.error}]}>{message}</Text>:null}
     <Button title={busy?'Publishing…':'Publish alert'} icon="alert-circle" disabled={busy||!animal||!locationComplete} onPress={submit}/>
   </Screen>;

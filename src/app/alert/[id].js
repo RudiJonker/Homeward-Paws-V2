@@ -21,11 +21,12 @@ export default function PublicAlert(){
   return <Screen title={title} lead={`Public alert · ${alert.id}`}>
     <Image source={alert.photo} style={s.photo}/>
     <Status value={alert.status}/>
+    <Text style={s.muted}>Posted by {alert.ownerName}</Text>
     <Card><Text style={s.h2}>Last seen</Text><Text style={s.body}>{alert.area}</Text><Text style={s.body}>{alert.lastSeen}</Text><Text style={s.body}>{alert.description}</Text>{alert.extra?<Text style={s.body}>{alert.extra}</Text>:null}</Card>
     <Button title="Share alert" icon="share-variant" onPress={share}/>
     {owns?<Button title="Manage alert" kind="secondary" onPress={()=>router.push(`/manage/${alert.id}`)}/>:isMissing?<>
       <Button title={isFollowing?'Unfollow alert':'Follow alert'} kind="secondary" onPress={follow}/>
-      {session?<Button title="I saw this animal" icon="eye" onPress={()=>router.push(`/sighting/${alert.id}`)}/>:<Button title="Log in to send a sighting" icon="eye" onPress={async()=>{await setPendingAction({route:`/sighting/${alert.id}`});router.push('/login')}}/>}
+      {session?<><Button title="I found this animal" icon="home-heart" onPress={()=>router.push({pathname:`/sighting/${alert.id}`,params:{responseType:'found'}})}/><Button title="I saw this animal" kind="secondary" icon="eye" onPress={()=>router.push(`/sighting/${alert.id}`)}/></>:<><Button title="Log in - I found this animal" icon="home-heart" onPress={async()=>{await setPendingAction({route:`/sighting/${alert.id}`,draft:{responseType:'found'}});router.push('/login')}}/><Button title="Log in - I saw this animal" kind="secondary" icon="eye" onPress={async()=>{await setPendingAction({route:`/sighting/${alert.id}`,draft:{responseType:'sighted'}});router.push('/login')}}/></>}
     </>:isFollowing?<Button title="Unfollow alert" kind="secondary" onPress={follow}/>:null}
   </Screen>;
 }

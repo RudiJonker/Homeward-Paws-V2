@@ -50,7 +50,7 @@ export function StoreProvider({children}){
       followRows=follows||[];sightingRows=sightings||[];
     }
     const rows=await Promise.all((data||[]).map(async alert=>({
-      databaseId:alert.id,id:alert.reference,ownerId:alert.owner_id,animalId:alert.animal_id,
+      databaseId:alert.id,id:alert.reference,ownerId:alert.owner_id,ownerName:alert.owner_display_name||'Homeward Paws member',animalId:alert.animal_id,
       name:alert.animal_name,type:alert.animal_type,description:alert.description,
       area:[alert.suburb,alert.city,alert.province].filter(Boolean).join(', '),province:alert.province,city:alert.city,suburb:alert.suburb,
       lastSeen:alert.last_seen_unknown?'Not sure':new Date(alert.last_seen_at).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}),
@@ -58,6 +58,9 @@ export function StoreProvider({children}){
       photo:await signedAnimalPhoto(alert.photo_path,alert.animal_type),photoPath:alert.photo_path,
       sightings:sightingRows.filter(item=>item.alert_reference===alert.reference).map(item=>({
         id:item.id,
+        responseType:item.response_type||'sighted',
+        whatsappRequested:item.whatsapp_requested,
+        contactStatus:item.contact_status,
         area:item.province&&item.city&&item.suburb?[item.suburb,item.city,item.province].join(', '):item.area,
         when:item.seen_at?new Date(item.seen_at).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}):item.seen_when,
         note:[item.location_details,item.note].filter(Boolean).join(' · '),
@@ -90,7 +93,7 @@ export function StoreProvider({children}){
     async publish(report){
       if(!userId)throw new Error('Sign in to publish.');
       const animal=animals.find(item=>item.id===report.animalId);if(!animal)throw new Error('Choose an animal before publishing.');
-      const row={owner_id:userId,animal_id:animal.id,animal_name:animal.name,animal_type:animal.type,description:animal.description,photo_path:animal.photoPath||null,last_seen_at:report.lastSeenAt,last_seen_unknown:!report.lastSeenAt,province:report.province,city:report.city,suburb:report.suburb,extra_details:report.extra||'',whatsapp_enabled:report.whatsapp};
+      const row={owner_id:userId,animal_id:animal.id,animal_name:animal.name,animal_type:animal.type,description:animal.description,photo_path:animal.photoPath||null,last_seen_at:report.lastSeenAt,last_seen_unknown:!report.lastSeenAt,province:report.province,city:report.city,suburb:report.suburb,extra_details:report.extra||''};
       const {data,error}=await supabase.from('missing_alerts').insert(row).select('reference').single();if(error)throw error;
       await loadAlerts();return data.reference;
     },
@@ -102,7 +105,7 @@ export function StoreProvider({children}){
     },
     async addSighting(reference,sighting){
       if(!userId)throw new Error('Sign in to send a sighting.');
-      const {error}=await supabase.from('alert_sightings').insert({alert_reference:reference,author_id:userId,area:sighting.area.trim(),seen_when:sighting.when.trim(),province:sighting.location.province.trim(),city:sighting.location.city.trim(),suburb:sighting.location.suburb.trim(),location_details:sighting.details.trim(),seen_at:sighting.seenAt,note:''});if(error)throw error;
+      const {error}=await supabase.from('alert_sightings').insert({alert_reference:reference,author_id:userId,response_type:sighting.responseType==='found'?'found':'sighted',area:sighting.area.trim(),seen_when:sighting.when.trim(),province:sighting.location.province.trim(),city:sighting.location.city.trim(),suburb:sighting.location.suburb.trim(),location_details:sighting.details.trim(),seen_at:sighting.seenAt,note:'',whatsapp_requested:!!sighting.whatsappRequested,contact_status:sighting.whatsappRequested?'pending':'none'});if(error)throw error;
       await loadAlerts();
     },
     async endAlert(reference,status){

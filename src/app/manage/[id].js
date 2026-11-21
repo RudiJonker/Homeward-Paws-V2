@@ -19,9 +19,9 @@ export default function Manage(){
     <Status value={alert.status}/>
     <Button title="View public alert" kind="secondary" onPress={()=>router.push(`/alert/${alert.id}`)}/>
     <Button title="Share again (preview)" kind="secondary" icon="share-variant" onPress={()=>Share.share({message:`PREVIEW: ${alert.name} is missing. Reference ${alert.id}.`})}/>
-    <Text style={s.h2}>Private sightings</Text>
-    {alert.sightings.map(sighting=><Card key={sighting.id}><Text style={s.h2}>{sighting.area}</Text><Text style={s.body}>{sighting.when}</Text>{sighting.note?<Text style={s.body}>{sighting.note}</Text>:null}</Card>)}
-    {!alert.sightings.length?<Card><Text style={s.body}>No sightings yet.</Text></Card>:null}
+    <Text style={s.h2}>Private community responses</Text>
+    {alert.sightings.map(sighting=><Card key={sighting.id}><Text style={s.muted}>{sighting.responseType==='found'?'FOUND SAFELY':'SIGHTED'}</Text><Text style={s.h2}>{sighting.area}</Text><Text style={s.body}>{sighting.when}</Text>{sighting.note?<Text style={s.body}>{sighting.note}</Text>:null}{sighting.whatsappRequested?<>{sighting.contactStatus==='declined'?<Text style={s.muted}>WhatsApp contact request declined</Text>:<Button title={sighting.contactStatus==='accepted'?'Contact & safety':'Review contact request'} kind="secondary" icon="whatsapp" onPress={()=>router.push(`/contact/${sighting.id}`)}/>}</>:sighting.responseType==='found'?<Text style={s.muted}>No contact consent was included with this earlier Found update. The finder must submit a new update with contact enabled.</Text>:null}</Card>)}
+    {!alert.sightings.length?<Card><Text style={s.body}>No sightings or found updates yet.</Text></Card>:null}
     {alert.status==='missing'?<Card><Text style={s.h2}>End this alert</Text><Button title="Mark reunited" icon="home-heart" onPress={()=>finish('reunited')}/><Button title="Close without reunion" kind="danger" onPress={()=>finish('closed')}/></Card>:null}
   </Screen>;
 }
