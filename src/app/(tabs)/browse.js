@@ -65,6 +65,11 @@ export default function Browse(){
     }
     return `${alert.name} ${alert.area} ${alert.id}`.toLowerCase().includes(q.trim().toLowerCase());
   });
+  const foundCutoff=filterNow.getTime()-30*24*60*60*1000;
+  const visibleFoundReports=foundReports.filter(report=>report.status==='found'||(report.status==='reunited'&&new Date(report.reunitedAt).getTime()>=foundCutoff)).sort((a,b)=>{
+    if(a.status==='found'&&b.status!=='found')return -1;if(a.status!=='found'&&b.status==='found')return 1;
+    return new Date(b.createdAt).getTime()-new Date(a.createdAt).getTime();
+  });
   return <Screen title="Browse" lead="Browse animal reports in your community.">
     <View accessibilityRole="tablist" style={local.browseTabs}>{BROWSE_TABS.map(([value,label])=><BrowseTab key={value} label={label} selected={view===value} onPress={()=>setView(value)}/>)}</View>
     {view==='missing'?<>
@@ -86,7 +91,7 @@ export default function Browse(){
     <Text style={s.muted}>{shown.length} missing {shown.length===1?'animal':'animals'} found</Text>
     {shown.map(alert=><AlertCard key={alert.id} alert={alert} onPress={()=>router.push(`/alert/${alert.id}`)}/>)}
     {!shown.length?<View style={local.empty}><MaterialCommunityIcons name="map-search-outline" size={38} color={colors.muted}/><Text style={s.h2}>No missing animals match these filters.</Text><Text style={s.muted}>Try a wider area, a longer date range or reset the filters.</Text></View>:null}
-    </>:view==='found'?<>{foundReports.map(report=><AlertCard key={report.id} alert={report} onPress={()=>router.push(`/found/${report.id}`)}/>)}{!foundReports.length?<View style={local.empty}><MaterialCommunityIcons name="home-search-outline" size={38} color={colors.muted}/><Text style={s.h2}>No found animal reports yet.</Text><Text style={s.muted}>Found animals reported by the community will appear here.</Text></View>:null}</>:<>{sightedReports.map(report=><AlertCard key={report.id} alert={report} onPress={()=>router.push(`/sighted/${report.id}`)}/>)}{!sightedReports.length?<View style={local.empty}><MaterialCommunityIcons name="eye-outline" size={38} color={colors.muted}/><Text style={s.h2}>No sighted animal reports yet.</Text><Text style={s.muted}>Standalone animal sightings will appear here.</Text></View>:null}</>}
+    </>:view==='found'?<>{visibleFoundReports.map(report=><AlertCard key={report.id} alert={report} onPress={()=>router.push(`/found/${report.id}`)}/>)}{!visibleFoundReports.length?<View style={local.empty}><MaterialCommunityIcons name="home-search-outline" size={38} color={colors.muted}/><Text style={s.h2}>No found animal reports yet.</Text><Text style={s.muted}>Found animals reported by the community will appear here.</Text></View>:null}</>:<>{sightedReports.filter(report=>report.status==='sighted').map(report=><AlertCard key={report.id} alert={report} onPress={()=>router.push(`/sighted/${report.id}`)}/>)}{!sightedReports.some(report=>report.status==='sighted')?<View style={local.empty}><MaterialCommunityIcons name="eye-outline" size={38} color={colors.muted}/><Text style={s.h2}>No sighted animal reports yet.</Text><Text style={s.muted}>Standalone animal sightings will appear here.</Text></View>:null}</>}
   </Screen>;
 }
 

@@ -78,7 +78,7 @@ export function StoreProvider({children}){
       databaseId:report.id,id:report.reference,ownerId:report.reporter_id,ownerName:report.reporter_display_name||'Homeward Paws member',
       name:'Found animal',type:report.animal_type,description:report.description,
       area:[report.suburb,report.city,report.province].filter(Boolean).join(', '),province:report.province,city:report.city,suburb:report.suburb,
-      foundAt:report.found_at,foundWhen:new Date(report.found_at).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}),createdAt:report.created_at,
+      foundAt:report.found_at,foundWhen:new Date(report.found_at).toLocaleString('en-ZA',{dateStyle:'medium',timeStyle:'short'}),createdAt:report.created_at,reunitedAt:report.reunited_at,
       extra:report.location_details,status:report.status,photoPath:report.photo_path,photo:await signedAnimalPhoto(report.photo_path,report.animal_type),
       contacts:contactRows.filter(item=>item.report_reference===report.reference),
     })));
@@ -147,10 +147,22 @@ export function StoreProvider({children}){
       if(error?.code==='23505')throw new Error('You have already asked the reporter to contact you.');
       if(error)throw error;await loadSightedReports();
     },
+    async endSightedReport(reference,status){
+      if(!userId)throw new Error('Sign in to manage this report.');
+      if(status!=='resolved'&&status!=='closed')throw new Error('Invalid Sighted report status.');
+      const {error}=await supabase.from('sighted_reports').update({status}).eq('reference',reference).eq('reporter_id',userId);
+      if(error)throw error;await loadSightedReports();
+    },
     async requestFoundContact(reference){
       if(!userId)throw new Error('Sign in to request contact.');
       const {error}=await supabase.from('found_report_contacts').insert({report_reference:reference,requester_id:userId});
       if(error?.code==='23505')throw new Error('You have already asked the finder to contact you.');
+      if(error)throw error;await loadFoundReports();
+    },
+    async endFoundReport(reference,status){
+      if(!userId)throw new Error('Sign in to manage this report.');
+      if(status!=='reunited'&&status!=='closed')throw new Error('Invalid Found report status.');
+      const {error}=await supabase.from('found_reports').update({status,reunited_at:status==='reunited'?new Date().toISOString():null}).eq('reference',reference).eq('reporter_id',userId);
       if(error)throw error;await loadFoundReports();
     },
     async toggleFollow(reference){
